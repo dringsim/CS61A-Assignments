@@ -1,6 +1,8 @@
+from math import sqrt
 from operator import add, sub
 
-def a_plus_abs_b(a, b):
+
+def a_plus_abs_b(a: int, b: int) -> int:
     """Return a+abs(b), but without calling abs.
 
     >>> a_plus_abs_b(2, 3)
@@ -12,10 +14,7 @@ def a_plus_abs_b(a, b):
     >>> a_plus_abs_b(-1, -4)
     3
     """
-    if b < 0:
-        f = _____
-    else:
-        f = _____
+    f = sub if b < 0 else add
     return f(a, b)
 
 def a_plus_abs_b_syntax_check():
@@ -29,7 +28,7 @@ def a_plus_abs_b_syntax_check():
     # You don't need to edit this function. It's just here to check your work.
 
 
-def two_of_three(i, j, k):
+def two_of_three(i: int, j: int, k: int) -> int:
     """Return m*m + n*n, where m and n are the two smallest members of the
     positive numbers i, j, and k.
 
@@ -42,7 +41,7 @@ def two_of_three(i, j, k):
     >>> two_of_three(5, 5, 5)
     50
     """
-    return _____
+    return pow(i, 2) + pow(j, 2) + pow(k, 2) - pow(max(i, j, k), 2)
 
 def two_of_three_syntax_check():
     """Check that your two_of_three code consists of nothing but a return statement.
@@ -55,7 +54,7 @@ def two_of_three_syntax_check():
     # You don't need to edit this function. It's just here to check your work.
 
 
-def largest_factor(n):
+def largest_factor(n: int) -> int:
     """Return the largest factor of n that is smaller than n.
 
     >>> largest_factor(15) # factors are 1, 3, 5
@@ -65,10 +64,15 @@ def largest_factor(n):
     >>> largest_factor(13) # factor is 1 since 13 is prime
     1
     """
-    "*** YOUR CODE HERE ***"
+    i: int = 2
+    while i < sqrt(n):
+        if n % i == 0:
+            return n // i
+        i += 1
+    return 1
 
 
-def hailstone(n):
+def hailstone(n: int) -> int:
     """Print the hailstone sequence starting at n and return its
     length.
 
@@ -87,5 +91,10 @@ def hailstone(n):
     >>> b
     1
     """
-    "*** YOUR CODE HERE ***"
-
+    length: int = 1
+    print(n)
+    while n > 1:
+        n = n // 2 if n % 2 == 0 else 3 * n + 1
+        length += 1
+        print(n)
+    return length

@@ -1,4 +1,4 @@
-def digit(n, k):
+def digit(n: int, k: int) -> int:
     """Return the digit that is k from the right of n for positive integers n and k.
 
     >>> digit(3579, 2)
@@ -8,10 +8,10 @@ def digit(n, k):
     >>> digit(3579, 10)
     0
     """
-    return ____
+    return (n // pow(10, k)) % 10
 
 
-def middle(a, b, c):
+def middle(a: int, b: int, c: int) -> int:
     """Return the number among a, b, and c that is not the smallest or largest.
     Assume a, b, and c are all different numbers.
 
@@ -26,10 +26,10 @@ def middle(a, b, c):
     >>> middle(30, 5, 40)
     30
     """
-    return ____
+    return a + b + c - max(a, b, c) - min(a, b, c)
 
 
-def falling(n, k):
+def falling(n: int, k: int) -> int:
     """Compute the falling factorial of n to depth k.
 
     >>> falling(6, 3)  # 6 * 5 * 4
@@ -41,10 +41,15 @@ def falling(n, k):
     >>> falling(4, 0)
     1
     """
-    "*** YOUR CODE HERE ***"
+    ret: int = 1
+    while k > 0:
+        ret *= n
+        n -= 1
+        k -= 1
+    return ret
 
 
-def divisible_by_k(n, k):
+def divisible_by_k(n: int, k: int) -> int:
     """
     >>> a = divisible_by_k(10, 2)  # 2, 4, 6, 8, and 10 are divisible by 2
     2
@@ -64,10 +69,16 @@ def divisible_by_k(n, k):
     >>> c
     0
     """
-    "*** YOUR CODE HERE ***"
+    count: int = 0
+    while n > 0:
+        if n % k == 0:
+            print(n)
+            count += 1
+        n -= 1
+    return count
 
 
-def sum_digits(y):
+def sum_digits(y: int) -> int:
     """Sum all the digits of y.
 
     >>> sum_digits(10) # 1 + 0 = 1
@@ -80,10 +91,14 @@ def sum_digits(y):
     >>> a
     6
     """
-    "*** YOUR CODE HERE ***"
+    s: int = 0
+    while y > 0:
+        s += y % 10
+        y //= 10
+    return s
 
 
-def double_eights(n):
+def double_eights(n: int) -> bool:
     """Return true if n has two eights in a row.
     >>> double_eights(8)
     False
@@ -98,5 +113,11 @@ def double_eights(n):
     >>> double_eights(80808080)
     False
     """
-    "*** YOUR CODE HERE ***"
-
+    i: int = n % 10
+    while n > 0:
+        j: int = (n // 10) % 10
+        if i == j:
+            return True
+        n //= 10
+        i = j
+    return False

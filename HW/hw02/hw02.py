@@ -1,18 +1,19 @@
+from collections.abc import Callable
 from operator import add, mul
 
-square = lambda x: x * x
+square: Callable[[int], int] = lambda x: x * x
 
-identity = lambda x: x
+identity: Callable[[int], int] = lambda x: x
 
-triple = lambda x: 3 * x
+triple: Callable[[int], int] = lambda x: 3 * x
 
-increment = lambda x: x + 1
+increment: Callable[[int], int] = lambda x: x + 1
 
 
 HW_SOURCE_FILE=__file__
 
 
-def product(n, term):
+def product(n: int, term: Callable[[int], int]) -> int:
     """Return the product of the first n terms in a sequence.
 
     n: a positive integer
@@ -31,12 +32,16 @@ def product(n, term):
     >>> product(3, triple)    # 1*3 * 2*3 * 3*3
     162
     """
-    "*** YOUR CODE HERE ***"
+    ret: int = 1
+    while n > 0:
+        ret *= term(n)
+        n -= 1
+    return ret
 
 
-def accumulate(fuse, start, n, term):
-    """Return the result of fusing together the first n terms in a sequence 
-    and start.  The terms to be fused are term(1), term(2), ..., term(n). 
+def accumulate(fuse: Callable[[int, int], int], start: int, n: int, term: Callable[[int], int]) -> int:
+    """Return the result of fusing together the first n terms in a sequence
+    and start.  The terms to be fused are term(1), term(2), ..., term(n).
     The function fuse is a two-argument commutative & associative function.
 
     >>> accumulate(add, 0, 5, identity)  # 0 + 1 + 2 + 3 + 4 + 5
@@ -53,10 +58,14 @@ def accumulate(fuse, start, n, term):
     >>> accumulate(lambda x, y: x + y + 1, 2, 3, square)
     19
     """
-    "*** YOUR CODE HERE ***"
+    ret: int = start
+    while n > 0:
+        ret = fuse(ret, term(n))
+        n -= 1
+    return ret
 
 
-def summation_using_accumulate(n, term):
+def summation_using_accumulate(n: int, term: Callable[[int], int]) -> int:
     """Returns the sum: term(1) + ... + term(n), using accumulate.
 
     >>> summation_using_accumulate(5, square) # square(1) + square(2) + ... + square(4) + square(5)
@@ -68,10 +77,10 @@ def summation_using_accumulate(n, term):
     >>> [type(x).__name__ for x in ast.parse(inspect.getsource(summation_using_accumulate)).body[0].body]
     ['Expr', 'Return']
     """
-    return ____
+    return accumulate(add, 0, n, term)
 
 
-def product_using_accumulate(n, term):
+def product_using_accumulate(n: int, term: Callable[[int], int]) -> int:
     """Returns the product: term(1) * ... * term(n), using accumulate.
 
     >>> product_using_accumulate(4, square) # square(1) * square(2) * square(3) * square()
@@ -83,10 +92,10 @@ def product_using_accumulate(n, term):
     >>> [type(x).__name__ for x in ast.parse(inspect.getsource(product_using_accumulate)).body[0].body]
     ['Expr', 'Return']
     """
-    return ____
+    return accumulate(mul, 1, n, term)
 
 
-def make_repeater(f, n):
+def make_repeater(f: Callable[[int], int], n: int) -> Callable[[int], int]:
     """Returns the function that computes the nth application of f.
 
     >>> add_three = make_repeater(increment, 3)
@@ -99,5 +108,10 @@ def make_repeater(f, n):
     >>> make_repeater(square, 3)(5) # square(square(square(5)))
     390625
     """
-    "*** YOUR CODE HERE ***"
-
+    def ret(x: int) -> int:
+        i: int = n
+        while i > 0:
+            x = f(x)
+            i -= 1
+        return x
+    return ret

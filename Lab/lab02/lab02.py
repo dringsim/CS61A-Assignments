@@ -1,5 +1,8 @@
+from collections.abc import Callable
+from typing import Any
 
-def composite_identity(f, g):
+
+def composite_identity(f: Callable[[Any], Any], g: Callable[[Any], Any]) -> Callable[[Any], bool]:
     """
     Return a function with one parameter x that returns True if f(g(x)) is
     equal to g(f(x)). You can assume the result of g(x) is a valid input for f
@@ -13,28 +16,28 @@ def composite_identity(f, g):
     >>> b1(4)                            # (4 + 1) ** 2 != 4 ** 2 + 1
     False
     """
-    "*** YOUR CODE HERE ***"
+    return lambda x: f(g(x)) == g(f(x))
 
 
-def sum_digits(y):
+def sum_digits(y: int) -> int:
     """Return the sum of the digits of non-negative integer y."""
-    total = 0
+    total: int = 0
     while y > 0:
         total, y = total + y % 10, y // 10
     return total
 
-def is_prime(n):
+def is_prime(n: int) -> bool:
     """Return whether positive integer n is prime."""
     if n == 1:
         return False
-    k = 2
+    k: int = 2
     while k < n:
         if n % k == 0:
             return False
         k += 1
     return True
 
-def count_cond(condition):
+def count_cond(condition: Callable[[int, int], bool]) -> Callable[[int], int]:
     """Returns a function with one parameter N that counts all the numbers from
     1 to N that satisfy the two-argument predicate function Condition, where
     the first argument for Condition is N and the second argument is the
@@ -59,10 +62,18 @@ def count_cond(condition):
     >>> count_primes(20)   # 2, 3, 5, 7, 11, 13, 17, 19
     8
     """
-    "*** YOUR CODE HERE ***"
+    def f(n: int) -> int:
+        count: int = 0
+        i: int = 1
+        while i <= n:
+            if condition(n, i):
+                count += 1
+            i += 1
+        return count
+    return f
 
 
-def multiple(a, b):
+def multiple(a: int, b: int) -> int:
     """Return the smallest number n that is a multiple of both a and b.
 
     >>> multiple(3, 4)
@@ -70,11 +81,15 @@ def multiple(a, b):
     >>> multiple(14, 21)
     42
     """
-    "*** YOUR CODE HERE ***"
+    def gcd(a: int, b: int) -> int:
+        while b != 0:
+            a, b = b, a % b
+        return a
+    return a * b // gcd(a, b)
 
 
 
-def cycle(f1, f2, f3):
+def cycle(f1: Callable[[int], int], f2: Callable[[int], int], f3: Callable[[int], int]) -> Callable[[int], Callable[[int], int]]:
     """Returns a function that is itself a higher-order function.
 
     >>> def add1(x):
@@ -100,5 +115,16 @@ def cycle(f1, f2, f3):
     >>> do_two_cycles(1)
     19
     """
-    "*** YOUR CODE HERE ***"
-
+    def f(n: int) -> Callable[[int], int]:
+        def g(x: int) -> int:
+            i: int = 1
+            while i <= n:
+                if i % 3 == 1:
+                    x = f1(x)
+                elif i % 3 == 2:
+                    x = f2(x)
+                else:
+                    x = f3(x)
+            return x
+        return g
+    return f
