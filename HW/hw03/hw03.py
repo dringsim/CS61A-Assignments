@@ -1,7 +1,8 @@
+from collections.abc import Callable
 HW_SOURCE_FILE = __file__
 
 
-def num_eights(n):
+def num_eights(n: int) -> int:
     """Returns the number of times 8 appears as a digit of n.
 
     >>> num_eights(3)
@@ -24,10 +25,12 @@ def num_eights(n):
     ...       ['Assign', 'AnnAssign', 'AugAssign', 'NamedExpr', 'For', 'While'])
     True
     """
-    "*** YOUR CODE HERE ***"
+    if n < 10:
+        return 1 if n == 8 else 0
+    return num_eights(n // 10) + num_eights(n % 10)
 
 
-def digit_distance(n):
+def digit_distance(n: int) -> int:
     """Determines the digit distance of n.
 
     >>> digit_distance(3)
@@ -46,10 +49,12 @@ def digit_distance(n):
     ...       ['For', 'While'])
     True
     """
-    "*** YOUR CODE HERE ***"
+    if n < 10:
+        return 0
+    return digit_distance(n // 10) + abs(n % 100 // 10 - n % 10)
 
 
-def interleaved_sum(n, odd_func, even_func):
+def interleaved_sum(n: int, odd_func: Callable[[int], int], even_func: Callable[[int], int]) -> int:
     """Compute the sum odd_func(1) + even_func(2) + odd_func(3) + ..., up
     to n.
 
@@ -70,10 +75,12 @@ def interleaved_sum(n, odd_func, even_func):
     >>> check(HW_SOURCE_FILE, 'interleaved_sum', ['BitAnd', 'BitOr', 'BitXor']) # ban bitwise operators, don't worry about these if you don't know what they are
     True
     """
-    "*** YOUR CODE HERE ***"
+    if n <= 0:
+        return 0
+    return odd_func(1) + interleaved_sum(n - 1, lambda x: even_func(x + 1), lambda x: odd_func(x + 1))
 
 
-def next_smaller_dollar(bill):
+def next_smaller_dollar(bill: int) -> int | None:
     """Returns the next smaller bill in order."""
     if bill == 100:
         return 50
@@ -86,7 +93,7 @@ def next_smaller_dollar(bill):
     elif bill == 5:
         return 1
 
-def count_dollars(total):
+def count_dollars(total: int) -> int:
     """Return the number of ways to make change.
 
     >>> count_dollars(15)  # 15 $1 bills, 10 $1 & 1 $5 bills, ... 1 $5 & 1 $10 bills
@@ -106,10 +113,16 @@ def count_dollars(total):
     >>> check(HW_SOURCE_FILE, 'count_dollars', ['While', 'For'])
     True
     """
-    "*** YOUR CODE HERE ***"
+    def f(x: int, n: int | None) -> int:
+        if x < 0 or n is None:
+            return 0
+        if x == 0:
+            return 1
+        return f(x - n, n) + f(x, next_smaller_dollar(n))
+    return f(total, 100)
 
 
-def next_larger_dollar(bill):
+def next_larger_dollar(bill: int) -> int | None:
     """Returns the next larger bill in order."""
     if bill == 1:
         return 5
@@ -122,7 +135,7 @@ def next_larger_dollar(bill):
     elif bill == 50:
         return 100
 
-def count_dollars_upward(total):
+def count_dollars_upward(total: int) -> int:
     """Return the number of ways to make change using bills.
 
     >>> count_dollars_upward(15)  # 15 $1 bills, 10 $1 & 1 $5 bills, ... 1 $5 & 1 $10 bills
@@ -142,14 +155,20 @@ def count_dollars_upward(total):
     >>> check(HW_SOURCE_FILE, 'count_dollars_upward', ['While', 'For'])
     True
     """
-    "*** YOUR CODE HERE ***"
+    def f(x: int, n: int | None) -> int:
+        if x <= 0 or n is None or x < n:
+            return 0
+        if x == n:
+            return 1
+        return f(x - n, n) + f(x, next_larger_dollar(n))
+    return f(total, 1)
 
 
-def print_move(origin, destination):
+def print_move(origin: int, destination: int) -> None:
     """Print instructions to move a disk."""
     print("Move the top disk from rod", origin, "to rod", destination)
 
-def move_stack(n, start, end):
+def move_stack(n: int, start: int, end: int) -> None:
     """Print the moves required to move n disks on the start pole to the end
     pole without violating the rules of Towers of Hanoi.
 
@@ -177,12 +196,18 @@ def move_stack(n, start, end):
     Move the top disk from rod 1 to rod 3
     """
     assert 1 <= start <= 3 and 1 <= end <= 3 and start != end, "Bad start/end"
-    "*** YOUR CODE HERE ***"
+    if n == 1:
+        print_move(start, end)
+        return
+    mid: int = 6 - (start + end)
+    move_stack(n - 1, start, mid)
+    move_stack(1, start, end)
+    move_stack(n - 1, mid, end)
 
 
 from operator import sub, mul
 
-def make_anonymous_factorial():
+def make_anonymous_factorial() -> Callable[[int], int]:
     """Return the value of an expression that computes factorial.
 
     >>> make_anonymous_factorial()(5)
@@ -193,5 +218,6 @@ def make_anonymous_factorial():
     ...     ['Assign', 'AnnAssign', 'AugAssign', 'NamedExpr', 'FunctionDef', 'Recursion'])
     True
     """
-    return 'YOUR_EXPRESSION_HERE'
-
+    # return lambda x: (lambda f, x: f(f, x))((lambda f, x: 1 if x <= 1 else x * f(f, x - 1)), x)
+    # return (lambda f: lambda x: f(f, x))(lambda f, x: 1 if x <= 1 else x * f(f, x - 1))
+    return (lambda f: f(f))(lambda f: lambda x: 1 if x <= 1 else x * f(f)(x - 1))

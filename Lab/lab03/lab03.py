@@ -1,7 +1,10 @@
+from collections.abc import Callable
+from typing import Any
+
 LAB_SOURCE_FILE = __file__
 
 
-def print_if(s, f):
+def print_if(s: list[Any], f: Callable[[Any], bool]) -> None:
     """Print each element of s for which f returns a true value.
 
     >>> print_if([3, 4, 5, 6], lambda x: x > 4)
@@ -14,10 +17,11 @@ def print_if(s, f):
     None
     """
     for x in s:
-        "*** YOUR CODE HERE ***"
+        if f(x) is True:
+            print(x)
 
 
-def close(s, k):
+def close(s: list[int], k: int) -> int:
     """Return how many elements of s that are within k of their index.
 
     >>> t = [6, 2, 4, 3, 5]
@@ -30,13 +34,14 @@ def close(s, k):
     >>> close(list(range(10)), 0)
     10
     """
-    count = 0
+    count: int = 0
     for i in range(len(s)):  # Use a range to loop over indices
-        "*** YOUR CODE HERE ***"
+        if abs(s[i] - i) <= k:
+            count += 1
     return count
 
 
-def close_list(s, k):
+def close_list(s: list[int], k: int) -> list[int]:
     """Return a list of the elements of s that are within k of their index.
 
     >>> t = [6, 2, 4, 3, 5]
@@ -47,12 +52,12 @@ def close_list(s, k):
     >>> close_list(t, 2)  # 2, 3, 4, and 5 are all within 2 of their index
     [2, 4, 3, 5]
     """
-    return [___ for i in range(len(s)) if ___]
+    return [s[i] for i in range(len(s)) if abs(s[i] - i) <= k]
 
 
 from math import sqrt
 
-def squares(s):
+def squares(s: list[int]) -> list[int]:
     """Returns a new list containing square roots of the elements of the
     original list that are perfect squares.
 
@@ -63,10 +68,10 @@ def squares(s):
     >>> squares(seq)
     []
     """
-    return [___ for n in s if ___]
+    return [int(sqrt(n)) for n in s if sqrt(n) == round(sqrt(n))]
 
 
-def double_eights(n):
+def double_eights(n: int) -> bool:
     """Returns whether or not n has two digits in row that
     are the number 8.
 
@@ -87,10 +92,12 @@ def double_eights(n):
     >>> check(LAB_SOURCE_FILE, 'double_eights', ['While', 'For'])
     True
     """
-    "*** YOUR CODE HERE ***"
+    if n < 10:
+        return False
+    return (n % 10 == 8 and (n // 10) % 10 == 8) or double_eights(n // 10)
 
 
-def make_onion(f, g):
+def make_onion(f: Callable[[Any], Any], g: Callable[[Any], Any]) -> Callable[[Any, Any, int], bool]:
     """Return a function can_reach(x, y, limit) that returns
     whether some call expression containing only f, g, and x with
     up to limit calls will give the result y.
@@ -114,12 +121,12 @@ def make_onion(f, g):
     >>> can_reach_string("peach", "folding", 4)   # Not possible
     False
     """
-    def can_reach(x, y, limit):
+    def can_reach(x: Any, y: Any, limit: int) -> bool:
         if limit < 0:
-            return ____
+            return False
         elif x == y:
-            return ____
+            return True
         else:
-            return can_reach(____, ____, limit - 1) or can_reach(____, ____, limit - 1)
+            return can_reach(f(x), y, limit - 1) or can_reach(g(x), y, limit - 1)
     return can_reach
 
