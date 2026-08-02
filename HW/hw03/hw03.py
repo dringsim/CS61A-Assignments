@@ -1,4 +1,5 @@
 from collections.abc import Callable
+
 HW_SOURCE_FILE = __file__
 
 
