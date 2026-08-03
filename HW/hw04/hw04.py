@@ -1,4 +1,8 @@
-def shuffle(s):
+from collections.abc import Callable
+from typing import Any
+
+
+def shuffle(s: list[Any]) -> list[Any]:
     """Return a shuffled list that interleaves the two halves of s.
 
     >>> shuffle(range(6))
@@ -12,10 +16,11 @@ def shuffle(s):
     ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
     """
     assert len(s) % 2 == 0, 'len(seq) must be even'
-    "*** YOUR CODE HERE ***"
+    ss = [s[:len(s) // 2], s[len(s) // 2:]]
+    return [ss[i % 2][i // 2] for i in range(len(s))]
 
 
-def deep_map(f, s):
+def deep_map(f: Callable[[Any], Any], s: list[Any]) -> None:
     """Replace all non-list elements x with f(x) in the nested list s.
 
     >>> six = [1, 2, [3, [4], 5], 6]
@@ -37,7 +42,11 @@ def deep_map(f, s):
     >>> s3 is s2[1]
     True
     """
-    "*** YOUR CODE HERE ***"
+    for i in range(len(s)):
+        if type(s[i]) == list:
+            deep_map(f, s[i])
+        else:
+            s[i] = f(s[i])
 
 
 HW_SOURCE_FILE=__file__
@@ -46,12 +55,12 @@ HW_SOURCE_FILE=__file__
 def planet(mass):
     """Construct a planet of some mass."""
     assert mass > 0
-    "*** YOUR CODE HERE ***"
+    return ['planet', mass]
 
 def mass(p):
     """Select the mass of a planet."""
     assert is_planet(p), 'must call mass on a planet'
-    "*** YOUR CODE HERE ***"
+    return p[1]
 
 def is_planet(p):
     """Whether p is a planet."""
@@ -83,7 +92,7 @@ def total_mass(m):
         assert is_mobile(m), "must get total mass of a mobile or a planet"
         return total_mass(end(left(m))) + total_mass(end(right(m)))
 
-def balanced(m):
+def balanced(m) -> bool:
     """Return whether m is balanced.
 
     >>> t, u, v = examples()
@@ -103,10 +112,17 @@ def balanced(m):
     >>> check(HW_SOURCE_FILE, 'balanced', ['Index'])
     True
     """
-    "*** YOUR CODE HERE ***"
+    assert is_mobile(m)
+    left_obj = end(left(m))
+    right_obj = end(right(m))
+    if is_mobile(left_obj) and not balanced(left_obj):
+        return False
+    if is_mobile(right_obj) and not balanced(right_obj):
+        return False
+    return length(left(m)) * total_mass(left_obj) == length(right(m)) * total_mass(right_obj)
 
 
-def berry_finder(t):
+def berry_finder(t) -> bool:
     """Returns True if t contains a node with the value 'berry' and 
     False otherwise.
 
@@ -123,7 +139,15 @@ def berry_finder(t):
     >>> berry_finder(t)
     True
     """
-    "*** YOUR CODE HERE ***"
+    assert is_tree(t)
+    if label(t) == 'berry':
+        return True
+    if is_leaf(t):
+        return False
+    for b in branches(t):
+        if berry_finder(b):
+            return True
+    return False
 
 
 HW_SOURCE_FILE=__file__
@@ -138,7 +162,13 @@ def max_path_sum(t):
     >>> max_path_sum(t2) # 5, 2, 10
     17
     """
-    "*** YOUR CODE HERE ***"
+    assert is_tree(t)
+    path_sum = label(t)
+    if is_leaf(t):
+        return path_sum
+    for b in branches(t):
+        path_sum = max(path_sum, label(t) + max_path_sum(b))
+    return path_sum
 
 
 def mobile(left, right):
