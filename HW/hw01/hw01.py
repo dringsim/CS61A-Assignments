@@ -2,7 +2,7 @@ from math import sqrt
 from operator import add, sub
 
 
-def a_plus_abs_b(a: int, b: int) -> int:
+def a_plus_abs_b(a: float, b: float) -> int | float:
     """Return a+abs(b), but without calling abs.
 
     >>> a_plus_abs_b(2, 3)

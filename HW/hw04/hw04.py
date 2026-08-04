@@ -1,8 +1,7 @@
 from collections.abc import Callable
-from typing import Any
 
 
-def shuffle(s: list[Any]) -> list[Any]:
+def shuffle[T](s: list[T]) -> list[T]:
     """Return a shuffled list that interleaves the two halves of s.
 
     >>> shuffle(range(6))
@@ -16,11 +15,11 @@ def shuffle(s: list[Any]) -> list[Any]:
     ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
     """
     assert len(s) % 2 == 0, 'len(seq) must be even'
-    ss = [s[:len(s) // 2], s[len(s) // 2:]]
+    ss: list[list[T]] = [s[:len(s) // 2], s[len(s) // 2:]]
     return [ss[i % 2][i // 2] for i in range(len(s))]
 
 
-def deep_map(f: Callable[[Any], Any], s: list[Any]) -> None:
+def deep_map[T1, T2](f: Callable[[T1], T2], s: list[T1 | T2]) -> None:
     """Replace all non-list elements x with f(x) in the nested list s.
 
     >>> six = [1, 2, [3, [4], 5], 6]

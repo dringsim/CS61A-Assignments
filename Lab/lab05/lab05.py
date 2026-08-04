@@ -1,7 +1,10 @@
+from collections.abc import Callable, Iterator
+from typing import Any
+
 HW_SOURCE_FILE=__file__
 
 
-def insert_items(s, before, after):
+def insert_items[T](s: list[T], before: T, after: T) -> list[T]:
     """Insert after into s after each occurrence of before and then return s.
 
     >>> test_s = [1, 5, 8, 5, 2, 3]
@@ -26,10 +29,15 @@ def insert_items(s, before, after):
     >>> large_s3 is large_s
     True
     """
-    "*** YOUR CODE HERE ***"
+    n: int = 0
+    for i in range(len(s)):
+        if s[i + n] == before:
+            s.insert(i + n + 1, after)
+            n += 1
+    return s
 
 
-def group_by(s, fn):
+def group_by[ValueT, KeyT](s: list[ValueT], fn: Callable[[ValueT], KeyT]) -> dict[KeyT, list[ValueT]]:
     """Return a dictionary of lists that together contain the elements of s.
     The key for each list is the value that fn returns when called on any of the
     values of that list.
@@ -39,17 +47,17 @@ def group_by(s, fn):
     >>> group_by(range(-3, 4), lambda x: x * x)
     {9: [-3, 3], 4: [-2, 2], 1: [-1, 1], 0: [0]}
     """
-    grouped = {}
-    for ____ in ____:
-        key = ____
+    grouped: dict[KeyT, list[ValueT]] = {}
+    for x in s:
+        key: KeyT = fn(x)
         if key in grouped:
-            ____
+            grouped[key].append(x)
         else:
-            grouped[key] = ____
+            grouped[key] = [x]
     return grouped
 
 
-def count_occurrences(t, n, x):
+def count_occurrences[T](t: Iterator[T], n: int, x: T) -> int:
     """Return the number of times that x is equal to one of the
     first n elements of iterator t.
 
@@ -70,10 +78,17 @@ def count_occurrences(t, n, x):
     >>> count_occurrences(v, 6, 6)
     2
     """
-    "*** YOUR CODE HERE ***"
+    ret: int = 0
+    for _ in range(n):
+        try:
+            if next(t) == x:
+                ret += 1
+        except StopIteration:
+            break
+    return ret
 
 
-def repeated(t, k):
+def repeated[T](t: Iterator[T], k: int) -> T | None:
     """Return the first value in iterator t that appears k times in a row,
     calling next on t as few times as possible.
 
@@ -93,7 +108,19 @@ def repeated(t, k):
     2
     """
     assert k > 1
-    "*** YOUR CODE HERE ***"
+    item: T = next(t)
+    i: int = 1
+    while i < k:
+        try:
+            next_item: T = next(t)
+            if next_item == item:
+                i += 1
+            else:
+                i = 1
+            item = next_item
+        except StopIteration:
+            break
+    return item if i == k else None
 
 
 def sprout_leaves(t, leaves):
@@ -129,10 +156,13 @@ def sprout_leaves(t, leaves):
           1
           2
     """
-    "*** YOUR CODE HERE ***"
+    assert is_tree(t)
+    if is_leaf(t):
+        return tree(label(t), [tree(item) for item in leaves])
+    return tree(label(t), [sprout_leaves(b, leaves) for b in branches(t)])
 
 
-def partial_reverse(s, start):
+def partial_reverse(s: list[Any], start: int) -> None:
     """Reverse part of a list in-place, starting with start up to the end of
     the list.
 
@@ -144,7 +174,10 @@ def partial_reverse(s, start):
     >>> a
     [1, 2, 7, 6, 5, 3, 4]
     """
-    "*** YOUR CODE HERE ***"
+    end: int = len(s) - 1
+    while start < end:
+        s[start], s[end] = s[end], s[start]
+        start, end = start + 1, end - 1
 
 
 

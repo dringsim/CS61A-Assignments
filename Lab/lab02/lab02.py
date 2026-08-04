@@ -1,8 +1,7 @@
 from collections.abc import Callable
-from typing import Any
 
 
-def composite_identity(f: Callable[[Any], Any], g: Callable[[Any], Any]) -> Callable[[Any], bool]:
+def composite_identity[T](f: Callable[[T], T], g: Callable[[T], T]) -> Callable[[T], bool]:
     """
     Return a function with one parameter x that returns True if f(g(x)) is
     equal to g(f(x)). You can assume the result of g(x) is a valid input for f

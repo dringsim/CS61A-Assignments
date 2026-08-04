@@ -1,4 +1,7 @@
-def hailstone(n):
+from collections.abc import Iterator
+
+
+def hailstone(n: int) -> Iterator[int]:
     """
     Yields the elements of the hailstone sequence starting at n.
     At the end of the sequence, yield 1 infinitely.
@@ -9,10 +12,13 @@ def hailstone(n):
     >>> next(hail_gen)
     1
     """
-    "*** YOUR CODE HERE ***"
+    while True:
+        yield n
+        if n > 1:
+            n = n // 2 if n % 2 == 0 else 3 * n + 1
 
 
-def merge(a, b):
+def merge[T: (float, int)](a: Iterator[T], b: Iterator[T]) -> Iterator[T]:
     """
     Return a generator that has all of the elements of generators a and b,
     in increasing order, without duplicates.
@@ -30,14 +36,17 @@ def merge(a, b):
     a_val, b_val = next(a), next(b)
     while True:
         if a_val == b_val:
-            "*** YOUR CODE HERE ***"
+            yield a_val
+            a_val, b_val = next(a), next(b)
         elif a_val < b_val:
-            "*** YOUR CODE HERE ***"
+            yield a_val
+            a_val = next(a)
         else:
-            "*** YOUR CODE HERE ***"
+            yield b_val
+            b_val = next(b)
 
 
-def stair_ways(n):
+def stair_ways(n: int) -> Iterator[list[int]]:
     """
     Yield all the ways to climb a set of n stairs taking
     1 or 2 steps at a time.
@@ -50,7 +59,21 @@ def stair_ways(n):
     >>> list(s_w) # Ensure you're not yielding extra
     []
     """
-    "*** YOUR CODE HERE ***"
+    if n == 0:
+        yield []
+    elif n >= 0:
+        s1 = stair_ways(n - 1)
+        while True:
+            try:
+                yield [1] + next(s1)
+            except StopIteration:
+                s2 = stair_ways(n - 2)
+                while True:
+                    try:
+                        yield [2] + next(s2)
+                    except StopIteration:
+                        break
+                break
 
 
 def yield_paths(t, value):
@@ -89,10 +112,10 @@ def yield_paths(t, value):
     [[0, 2], [0, 2, 1, 2]]
     """
     if label(t) == value:
-        yield ____
+        yield [label(t)]
     for b in branches(t):
-        for ____ in ____:
-            yield ____
+        for p in yield_paths(b, value):
+            yield [label(t)] + p
 
 
 

@@ -1,10 +1,9 @@
 from collections.abc import Callable
-from typing import Any
 
 LAB_SOURCE_FILE = __file__
 
 
-def print_if(s: list[Any], f: Callable[[Any], bool]) -> None:
+def print_if[T](s: list[T], f: Callable[[T], bool]) -> None:
     """Print each element of s for which f returns a true value.
 
     >>> print_if([3, 4, 5, 6], lambda x: x > 4)
@@ -97,7 +96,7 @@ def double_eights(n: int) -> bool:
     return (n % 10 == 8 and (n // 10) % 10 == 8) or double_eights(n // 10)
 
 
-def make_onion(f: Callable[[Any], Any], g: Callable[[Any], Any]) -> Callable[[Any, Any, int], bool]:
+def make_onion[T](f: Callable[[T], T], g: Callable[[T], T]) -> Callable[[T, T, int], bool]:
     """Return a function can_reach(x, y, limit) that returns
     whether some call expression containing only f, g, and x with
     up to limit calls will give the result y.
@@ -121,7 +120,7 @@ def make_onion(f: Callable[[Any], Any], g: Callable[[Any], Any]) -> Callable[[An
     >>> can_reach_string("peach", "folding", 4)   # Not possible
     False
     """
-    def can_reach(x: Any, y: Any, limit: int) -> bool:
+    def can_reach(x: T, y: T, limit: int) -> bool:
         if limit < 0:
             return False
         elif x == y:
