@@ -1,5 +1,6 @@
 """Typing test implementation"""
 
+from collections.abc import Callable
 from utils import (
     lower,
     split,
@@ -18,7 +19,7 @@ import random
 ###########
 
 
-def pick(paragraphs, select, k):
+def pick(paragraphs: list[str], select: Callable[[str], bool], k: int) -> str:
     """Return the Kth paragraph from PARAGRAPHS for which the SELECT returns True.
     If there are fewer than K such paragraphs, return an empty string.
 
@@ -37,11 +38,13 @@ def pick(paragraphs, select, k):
     ''
     """
     # BEGIN PROBLEM 1
-    "*** YOUR CODE HERE ***"
+    ps: list[str] = []
+    ps.extend(p for p in paragraphs if select(p))
+    return "" if k >= len(ps) else ps[k]
     # END PROBLEM 1
 
 
-def about(subject):
+def about(subject: list[str]) -> Callable[[str], bool]:
     """Return a function that takes in a paragraph and returns whether
     that paragraph contains one of the words in SUBJECT.
 
@@ -57,11 +60,17 @@ def about(subject):
     assert all([lower(x) == x for x in subject]), "subjects should be lowercase."
 
     # BEGIN PROBLEM 2
-    "*** YOUR CODE HERE ***"
+    def f(x: str) -> bool:
+        words = remove_punctuation(x.lower()).split(" ")
+        for s in subject:
+            if s in words:
+                return True
+        return False
+    return f
     # END PROBLEM 2
 
 
-def accuracy(typed, source):
+def accuracy(typed: str, source: str) -> float:
     """Return the accuracy (percentage of words typed correctly) of TYPED
     compared to the corresponding words in SOURCE.
 
@@ -87,11 +96,23 @@ def accuracy(typed, source):
     typed_words = split(typed)
     source_words = split(source)
     # BEGIN PROBLEM 3
-    "*** YOUR CODE HERE ***"
+    if not typed and not source:
+        return 100.0
+    if not typed or not source:
+        return 0.0
+    if len(typed_words) < len(source_words):
+        source_words = source_words[:len(typed_words)]
+    elif len(typed_words) > len(source_words):
+        source_words += (len(typed_words) - len(source_words)) * ['']
+    count: int = 0
+    for i in range(len(typed_words)):
+        if typed_words[i] == source_words[i]:
+            count += 1
+    return count / len(typed_words) * 100
     # END PROBLEM 3
 
 
-def wpm(typed, elapsed):
+def wpm(typed: str, elapsed: float) -> float:
     """Return the words-per-minute (WPM) of the TYPED string.
 
     Arguments:
@@ -105,7 +126,7 @@ def wpm(typed, elapsed):
     """
     assert elapsed > 0, "Elapsed time must be positive"
     # BEGIN PROBLEM 4
-    "*** YOUR CODE HERE ***"
+    return (len(typed) / 5) / elapsed * 60
     # END PROBLEM 4
 
 
@@ -135,7 +156,12 @@ def memo_diff(diff_function):
 
     def memoized(typed, source, limit):
         # BEGIN PROBLEM EC
-        "*** YOUR CODE HERE ***"
+        key = (typed, source)
+        if key not in cache or cache[key][1] < limit:
+            result = diff_function(typed, source, limit)
+            cache[key] = (result, limit)
+            return result
+        return cache[key][0]
         # END PROBLEM EC
 
     return memoized
@@ -146,7 +172,8 @@ def memo_diff(diff_function):
 ###########
 
 
-def autocorrect(typed_word, word_list, diff_function, limit):
+@memo
+def autocorrect(typed_word: str, word_list: list[str], diff_function: Callable[[str, str, float], float | int], limit: float) -> str:
     """Returns the element of WORD_LIST that has the smallest difference
     from TYPED_WORD based on DIFF_FUNCTION. If multiple words are tied for the smallest difference,
     return the one that appears closest to the front of WORD_LIST. If the
@@ -166,11 +193,20 @@ def autocorrect(typed_word, word_list, diff_function, limit):
     'testing'
     """
     # BEGIN PROBLEM 5
-    "*** YOUR CODE HERE ***"
+    if typed_word in word_list:
+        return typed_word
+    diff: float | None = None
+    word: str = typed_word
+    for x in word_list:
+        new_diff: float = diff_function(typed_word, x, limit)
+        if (diff is None and new_diff <= limit) or (diff is not None and new_diff < diff):
+            diff = new_diff
+            word = x
+    return word
     # END PROBLEM 5
 
 
-def furry_fixes(typed, source, limit):
+def furry_fixes(typed: str, source: str, limit: float) -> int:
     """A diff function for autocorrect that determines how many letters
     in TYPED need to be substituted to create SOURCE, then adds the difference in
     their lengths and returns the result.
@@ -193,11 +229,23 @@ def furry_fixes(typed, source, limit):
     5
     """
     # BEGIN PROBLEM 6
-    assert False, 'Remove this line'
+    if limit < 0:
+        return 0
+    if not typed:
+        return len(source)
+    if not source:
+        return len(typed)
+    if typed == source:
+        return 0
+    if limit == 0:
+        return 1
+    diff = 0 if typed[0] == source[0] else 1
+    return diff + furry_fixes(typed[1:], source[1:], limit - diff)
     # END PROBLEM 6
 
 
-def minimum_mewtations(typed, source, limit):
+@memo_diff
+def minimum_mewtations(typed: str, source: str, limit: float) -> int:
     """A diff function for autocorrect that computes the edit distance from TYPED to SOURCE.
     This function takes in a string TYPED, a string SOURCE, and a number LIMIT.
 
@@ -214,23 +262,22 @@ def minimum_mewtations(typed, source, limit):
     >>> minimum_mewtations("ckiteus", "kittens", big_limit) # ckiteus -> kiteus -> kitteus -> kittens
     3
     """
-    assert False, 'Remove this line'
-    if ___________: # Base cases should go here, you may add more base cases as needed.
-        # BEGIN
-        "*** YOUR CODE HERE ***"
-        # END
-    # Recursive cases should go below here
-    if ___________: # Feel free to remove or add additional cases
-        # BEGIN
-        "*** YOUR CODE HERE ***"
-        # END
-    else:
-        add = ... # Fill in these lines
-        remove = ...
-        substitute = ...
-        # BEGIN
-        "*** YOUR CODE HERE ***"
-        # END
+    if limit < 0:
+        return 0
+    if not typed:
+        return len(source)
+    if not source:
+        return len(typed)
+    if typed == source:
+        return 0
+    if limit == 0:
+        return 1
+    if typed[0] == source[0]:
+        return minimum_mewtations(typed[1:], source[1:], limit)
+    add = minimum_mewtations(typed, source[1:], limit - 1)
+    remove = minimum_mewtations(typed[1:], source, limit - 1)
+    substitute = minimum_mewtations(typed[1:], source[1:], limit - 1)
+    return 1 + min(add, remove, substitute)
 
 
 # Ignore the line below
@@ -251,7 +298,7 @@ FINAL_DIFF_LIMIT = 6  # REPLACE THIS WITH YOUR LIMIT
 ###########
 
 
-def report_progress(typed, source, user_id, upload):
+def report_progress(typed: list[str], source: list[str], user_id: int, upload: Callable[..., None]) -> float:
     """Upload a report of your id and progress so far to the multiplayer server.
     Returns the progress so far.
 
@@ -275,11 +322,18 @@ def report_progress(typed, source, user_id, upload):
     0.2
     """
     # BEGIN PROBLEM 8
-    "*** YOUR CODE HERE ***"
+    count: int = 0
+    for i in range(len(typed)):
+        if typed[i] != source[i]:
+            break
+        count += 1
+    progress: float = count / len(source)
+    upload({'id': user_id, 'progress': progress})
+    return progress
     # END PROBLEM 8
 
 
-def time_per_word(words, timestamps_per_player):
+def time_per_word(words: list[str], timestamps_per_player: list[list[int]]):
     """Return a dictionary {'words': words, 'times': times} where times
     is a list of lists that stores the durations it took each player to type
     each word in words.
@@ -299,7 +353,7 @@ def time_per_word(words, timestamps_per_player):
     """
     tpp = timestamps_per_player  # A shorter name (for convenience)
     # BEGIN PROBLEM 9
-    times = []  # You may remove this line
+    times = [[tpp[i][j + 1] - tpp[i][j] for j in range(len(words))] for i in range(len(tpp))]  # You may remove this line
     # END PROBLEM 9
     return {'words': words, 'times': times}
 
@@ -326,7 +380,17 @@ def fastest_words(words_and_times):
     player_indices = range(len(times))  # contains an *index* for each player
     word_indices = range(len(words))    # contains an *index* for each word
     # BEGIN PROBLEM 10
-    "*** YOUR CODE HERE ***"
+    list = [[] for _ in player_indices]
+    for i in word_indices:
+        fastest_player = 0
+        fastest_time = None
+        for j in player_indices:
+            time = get_time(times, j, i)
+            if fastest_time is None or time < fastest_time:
+                fastest_time = time
+                fastest_player = j
+        list[fastest_player].append(words[i])
+    return list
     # END PROBLEM 10
 
 

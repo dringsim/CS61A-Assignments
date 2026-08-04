@@ -12,7 +12,7 @@ def lines_from_file(path):
     with open(path, 'r') as f:
         return [line.strip() for line in f.readlines()]
 
-def remove_punctuation(s):
+def remove_punctuation(s: str) -> str:
     """Return a string with the same contents as s, but with punctuation removed.
 
     >>> remove_punctuation("It's a lovely day, don't you think?")
@@ -23,7 +23,7 @@ def remove_punctuation(s):
     punctuation_remover = str.maketrans('', '', string.punctuation)
     return s.strip().translate(punctuation_remover)
 
-def lower(s):
+def lower(s: str) -> str:
     """Return a lowercased version of s.
 
     >>> lower("HELLO")
@@ -35,7 +35,7 @@ def lower(s):
     """
     return s.lower()
 
-def split(s):
+def split(s: str) -> list[str]:
     """Return a list of words contained in s, which are sequences of characters
     separated by whitespace (spaces, tabs, etc.).
 
