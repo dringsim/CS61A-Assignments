@@ -1,14 +1,18 @@
+from abc import ABC
+from typing import ClassVar, Literal
+
+
 class Transaction:
-    def __init__(self, id, before, after):
-        self.id = id
-        self.before = before
-        self.after = after
+    def __init__(self, id: int, before: float, after: float):
+        self.id: int = id
+        self.before: float = before
+        self.after: float = after
 
-    def changed(self):
+    def changed(self) -> bool:
         """Return whether the transaction resulted in a changed balance."""
-        "*** YOUR CODE HERE ***"
+        return self.before != self.after
 
-    def report(self):
+    def report(self) -> str:
         """Return a string describing the transaction.
 
         >>> Transaction(3, 20, 10).report()
@@ -18,10 +22,10 @@ class Transaction:
         >>> Transaction(5, 50, 50).report()
         '5: no change'
         """
-        msg = 'no change'
+        msg: str = 'no change'
         if self.changed():
-            "*** YOUR CODE HERE ***"
-        return str(self.id) + ': ' + msg
+            msg = f"{'increased' if self.before < self.after else 'decreased'} {self.before!s}->{self.after!s}"
+        return f'{self.id!s}: {msg}'
 
 class BankAccount:
     """A bank account that tracks its transaction history.
@@ -64,24 +68,30 @@ class BankAccount:
 
     # *** YOU NEED TO MAKE CHANGES IN SEVERAL PLACES IN THIS CLASS ***
 
-    def __init__(self, account_holder):
-        self.balance = 0
-        self.holder = account_holder
+    def __init__(self, account_holder: str):
+        self.balance: float = 0
+        self.transactions: list[Transaction] = []
+        self.holder: str = account_holder
 
-    def deposit(self, amount):
+    def deposit(self, amount: float) -> float:
         """Increase the account balance by amount, add the deposit
         to the transaction history, and return the new balance.
         """
+        before: float = self.balance
         self.balance = self.balance + amount
+        self.transactions.append(Transaction(len(self.transactions), before, self.balance))
         return self.balance
 
-    def withdraw(self, amount):
+    def withdraw(self, amount: float) -> Literal['Insufficient funds'] | float:
         """Decrease the account balance by amount, add the withdraw
         to the transaction history, and return the new balance.
         """
         if amount > self.balance:
+            self.transactions.append(Transaction(len(self.transactions), self.balance, self.balance))
             return 'Insufficient funds'
+        before: float = self.balance
         self.balance = self.balance - amount
+        self.transactions.append(Transaction(len(self.transactions), before, self.balance))
         return self.balance
 
 
@@ -92,30 +102,30 @@ class Email:
         sender (Client): the client that sent the email
         recipient_name (str): the name of the recipient (another client)
     """
-    def __init__(self, msg, sender, recipient_name):
-        self.msg = msg
-        self.sender = sender
-        self.recipient_name = recipient_name
+    def __init__(self, msg: str, sender: 'Client', recipient_name: str):
+        self.msg: str = msg
+        self.sender: Client = sender
+        self.recipient_name: str = recipient_name
 
 class Server:
     """Each Server has one instance attribute called clients that is a
     dictionary from client names to client objects.
     """
     def __init__(self):
-        self.clients = {}
+        self.clients: dict[str, Client] = {}
 
-    def send(self, email):
+    def send(self, email: Email) -> None:
         """Append the email to the inbox of the client it is addressed to.
             email is an instance of the Email class.
         """
-        ____.inbox.append(email)
+        self.clients[email.recipient_name].inbox.append(email)
 
-    def register_client(self, client):
+    def register_client(self, client: 'Client') -> None:
         """Add a client to the clients mapping (which is a 
         dictionary from client names to client instances).
             client is an instance of the Client class.
         """
-        ____[____] = ____
+        self.clients[client.name] = client
 
 class Client:
     """A client has a server, a name (str), and an inbox (list).
@@ -134,15 +144,15 @@ class Client:
     >>> b.inbox[1].sender.name
     'Alice'
     """
-    def __init__(self, server, name):
-        self.inbox = []
-        self.server = server
-        self.name = name
-        server.register_client(____)
+    def __init__(self, server: Server, name: str) -> None:
+        self.inbox: list[Email] = []
+        self.server: Server = server
+        self.name: str = name
+        server.register_client(self)
 
-    def compose(self, message, recipient_name):
+    def compose(self, message: str, recipient_name: str) -> None:
         """Send an email with the given message to the recipient."""
-        email = Email(message, ____, ____)
+        email = Email(message, self, recipient_name)
         self.server.send(email)
 
 
@@ -175,29 +185,29 @@ class Mint:
     >>> dime.worth()     # 20 cents + (155 - 50 years)
     125
     """
-    present_year = 2024
+    present_year: ClassVar[int] = 2024
 
     def __init__(self):
         self.update()
 
-    def create(self, coin):
-        "*** YOUR CODE HERE ***"
+    def create(self, coin: type['Coin']) -> 'Coin':
+        return coin(self.year)
 
     def update(self):
-        "*** YOUR CODE HERE ***"
+        self.year: int = Mint.present_year
 
-class Coin:
-    cents = None # will be provided by subclasses, but not by Coin itself
+class Coin(ABC):
+    cents: ClassVar[int] # will be provided by subclasses, but not by Coin itself
 
-    def __init__(self, year):
-        self.year = year
+    def __init__(self, year: int):
+        self.year: int = year
 
-    def worth(self):
-        "*** YOUR CODE HERE ***"
+    def worth(self) -> int:
+        return self.cents + max((Mint.present_year - self.year - 50), 0)
 
 class Nickel(Coin):
-    cents = 5
+    cents: ClassVar[int] = 5
 
 class Dime(Coin):
-    cents = 10
+    cents: ClassVar[int] = 10
 

@@ -1,3 +1,6 @@
+from typing import Literal, override
+
+
 class Account:
     """An account has a balance and a holder.
 
@@ -17,18 +20,18 @@ class Account:
     >>> a.time_to_retire(100)
     117
     """
-    max_withdrawal = 10
-    interest = 0.02
+    max_withdrawal: float = 10
+    interest: float = 0.02
 
-    def __init__(self, account_holder):
-        self.balance = 0
-        self.holder = account_holder
+    def __init__(self, account_holder: str):
+        self.balance: float = 0
+        self.holder: str = account_holder
 
-    def deposit(self, amount):
+    def deposit(self, amount: float) -> float:
         self.balance = self.balance + amount
         return self.balance
 
-    def withdraw(self, amount):
+    def withdraw(self, amount: float) -> Literal["Insufficient funds", "Can't withdraw that amount"] | float:
         if amount > self.balance:
             return "Insufficient funds"
         if amount > self.max_withdrawal:
@@ -36,10 +39,16 @@ class Account:
         self.balance = self.balance - amount
         return self.balance
 
-    def time_to_retire(self, amount):
+    def time_to_retire(self, amount: float) -> int:
         """Return the number of years until balance would grow to amount."""
         assert self.balance > 0 and amount > 0 and self.interest > 0
-        "*** YOUR CODE HERE ***"
+        new_balance: float = self.balance
+        years: int = 0
+        while True:
+            if new_balance >= amount:
+                return years
+            new_balance *= 1 + self.interest
+            years += 1
 
 
 class FreeChecking(Account):
@@ -66,13 +75,18 @@ class FreeChecking(Account):
     >>> ch.withdraw(5)  # Not enough to cover fee + withdraw
     'Insufficient funds'
     """
-    withdraw_fee = 1
-    free_withdrawals = 2
+    withdraw_fee: float = 1
+    free_withdrawals: int = 2
 
-    "*** YOUR CODE HERE ***"
+    @override
+    def withdraw(self, amount: float) -> Literal["Insufficient funds", "Can't withdraw that amount"] | float:
+        if self.free_withdrawals > 0:
+            self.free_withdrawals -= 1
+            return Account.withdraw(self, amount)
+        return Account.withdraw(self, amount + self.withdraw_fee)
 
 
-def without(s, i):
+def without(s, i: int):
     """Return a new linked list like s but without the element at index i.
 
     >>> s = Link(3, Link(5, Link(7, Link(9))))
@@ -85,7 +99,12 @@ def without(s, i):
     >>> without(s, 4) is not s  # Make sure a copy is created
     True
     """
-    "*** YOUR CODE HERE ***"
+    assert i >= 0
+    if s is Link.empty:
+        return s
+    if i == 0:
+        return s.rest
+    return Link(s.first, without(s.rest, i - 1))
 
 
 def duplicate_link(s, val):
@@ -104,7 +123,12 @@ def duplicate_link(s, val):
     >>> z
     Link(1, Link(2, Link(2, Link(2, Link(2, Link(3))))))
     """
-    "*** YOUR CODE HERE ***"
+    if s is Link.empty:
+        return
+    if isinstance(s.rest, Link):
+        duplicate_link(s.rest, val)
+    if s.first == val:
+        s.rest = Link(s.first, s.rest)
 
 
 class Link:
