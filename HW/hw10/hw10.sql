@@ -46,6 +46,6 @@ CREATE TABLE sentences AS
 
 -- Height range for each fur type where all of the heights differ by no more than 30% from the average height
 CREATE TABLE low_variance AS
-  SELECT a.fur AS fur, MAX(a.height) - MIN(b.height) as height_range FROM dogs AS a, dogs AS b WHERE a.fur = b.fur
-    GROUP BY a.fur HAVING MAX(a.height) <= 1.3 * AVG(a.height) AND MIN(a.height) >= 0.7 * AVG(a.height);
+  SELECT fur, MAX(height) - MIN(height) as height_range FROM dogs
+    GROUP BY fur HAVING MAX(height) <= 1.3 * AVG(height) AND MIN(height) >= 0.7 * AVG(height);
 
