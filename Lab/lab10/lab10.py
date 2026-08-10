@@ -83,14 +83,7 @@ def eval_and(expressions):
         return scheme_f
     if expressions.rest is nil:
         return first
-    rest = calc_eval(expressions.rest.first)
-    if isinstance(first, (int, float)) and isinstance(rest, (int, float)):
-        result = max(first, rest)
-    else:
-        result = rest
-    if expressions.rest.rest is nil:
-        return result
-    return eval_and(Pair(result, expressions.rest.rest))
+    return eval_and(expressions.rest)
 
 bindings = {}
 

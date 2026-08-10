@@ -1,3 +1,7 @@
+from collections.abc import Callable
+from typing import Any
+
+
 class Pair:
     """A pair has two instance attributes: first and rest. rest must be a Pair or nil
 
@@ -9,9 +13,9 @@ class Pair:
     >>> print(s.map(lambda x: x+4))
     (5 6)
     """
-    def __init__(self, first, rest):
+    def __init__(self, first, rest: 'Pair | nil'):
         self.first = first
-        self.rest = rest
+        self.rest: Pair | nil = rest
 
     def __repr__(self):
         return 'Pair({0}, {1})'.format(repr(self.first), repr(self.rest))
@@ -40,7 +44,7 @@ class Pair:
             return False
         return self.first == p.first and self.rest == p.rest
 
-    def map(self, fn):
+    def map(self, fn: Callable[[Any], Any]) -> 'Pair':
         """Return a Scheme list after mapping Python function FN to SELF."""
         mapped = fn(self.first)
         if self.rest is nil or isinstance(self.rest, Pair):
@@ -78,7 +82,7 @@ class nil:
 
 nil = nil() # Assignment hides the nil class; there is only one instance
 
-def repl_str(val):
+def repl_str(val) -> str:
     """Should largely match str(val), except for booleans and undefined."""
     if val is True:
         return "#t"

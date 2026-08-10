@@ -1,5 +1,8 @@
 """A Scheme interpreter and its read-eval-print loop."""
 
+from scheme_classes import Frame
+
+
 import sys
 import os
 
@@ -62,7 +65,7 @@ def add_builtins(frame, funcs_and_names):
     for name, py_func, proc_name, need_env in funcs_and_names:
         frame.define(name, BuiltinProcedure(py_func, name=proc_name, need_env=need_env))
 
-def create_global_frame():
+def create_global_frame() -> Frame:
     """Initialize and return a single-frame environment with built-in names."""
     env = Frame(None)
     env.define('eval',

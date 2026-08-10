@@ -6,10 +6,10 @@ from scheme_classes import *
 # Type Checking #
 #################
 
-def scheme_procedurep(x):
+def scheme_procedurep(x) -> bool:
     return isinstance(x, Procedure)
 
-def scheme_listp(x):
+def scheme_listp(x) -> bool:
     """Return whether x is a well-formed list. Assumes no cycles."""
     while x is not nil:
         if not isinstance(x, Pair):
@@ -17,34 +17,34 @@ def scheme_listp(x):
         x = x.rest
     return True
 
-def scheme_booleanp(x):
+def scheme_booleanp(x) -> bool:
     return x is True or x is False
 
-def scheme_numberp(x):
+def scheme_numberp(x) -> bool:
     return isinstance(x, numbers.Real) and not scheme_booleanp(x)
 
-def is_scheme_true(val):
+def is_scheme_true(val) -> bool:
     """All values in Scheme are true except False."""
     return val is not False
 
-def is_scheme_false(val):
+def is_scheme_false(val) -> bool:
     """Only False is false in scheme_reader."""
     return val is False
 
-def scheme_stringp(x):
+def scheme_stringp(x) -> bool:
     return isinstance(x, str) and x.startswith('"')
 
-def scheme_symbolp(x):
+def scheme_symbolp(x) -> bool:
     return isinstance(x, str) and not scheme_stringp(x)
 
-def scheme_nullp(x):
+def scheme_nullp(x) -> bool:
     return type(x).__name__ == 'nil'
 
-def scheme_atomp(x):
+def scheme_atomp(x) -> bool:
     return (scheme_booleanp(x) or scheme_numberp(x) or scheme_symbolp(x) or
             scheme_nullp(x) or scheme_stringp(x))
 
-def self_evaluating(expr):
+def self_evaluating(expr) -> bool:
     """Return whether EXPR evaluates to itself."""
     return (scheme_atomp(expr) and not scheme_symbolp(expr)) or expr is None
 
@@ -64,13 +64,13 @@ def validate_type(val, predicate, k, name):
         raise SchemeError(msg.format(k, name, type_name))
     return val
 
-def validate_procedure(procedure):
+def validate_procedure(procedure) -> None:
     """Check that PROCEDURE is a valid Scheme procedure."""
     if not scheme_procedurep(procedure):
         raise SchemeError('{0} is not callable: {1}'.format(
             type(procedure).__name__.lower(), repl_str(procedure)))
 
-def validate_form(expr, min, max=float('inf')):
+def validate_form(expr, min, max=float('inf')) -> None:
     """Check EXPR is a proper list whose length is at least MIN and no more
     than MAX (default: no maximum). Raises a SchemeError if this is not the
     case.
@@ -85,7 +85,7 @@ def validate_form(expr, min, max=float('inf')):
     elif length > max:
         raise SchemeError('too many operands in form')
 
-def validate_formals(formals):
+def validate_formals(formals) -> None:
     """Check that FORMALS is a valid parameter list, a Scheme list of symbols
     in which each symbol is distinct. Raise a SchemeError if the list of
     formals is not a list of symbols or if any symbol is repeated.

@@ -7,7 +7,10 @@
 ;; Returns a list of two-element lists
 (define (enumerate s)
   ; BEGIN PROBLEM 15
-  'replace-this-line
+    (if (null? s) '()
+      ;((lambda (f) (f f s 0)) (lambda (f in n) (if (= n (length s)) '() (cons (list n (car in)) (f f (cdr in) (+ n 1))))))
+      (((lambda (f) (f f)) (lambda (f) (lambda (in n) (if (= n (length s)) '() (cons (list n (car in)) ((f f) (cdr in) (+ n 1))))))) s 0)
+    )
   )
   ; END PROBLEM 15
 
@@ -17,7 +20,7 @@
 ;; the merged lists.
 (define (merge ordered? s1 s2)
   ; BEGIN PROBLEM 16
-  'replace-this-line
+  (if (null? s1) s2 (if (null? s2) s1 (if (ordered? (car s1) (car s2)) (cons (car s1) (cons (car s2) (merge ordered? (cdr s1) (cdr s2)))) (cons (car s2) (cons (car s1) (merge ordered? (cdr s1) (cdr s2)))))))
   )
   ; END PROBLEM 16
 
