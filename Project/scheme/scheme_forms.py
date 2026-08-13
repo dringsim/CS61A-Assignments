@@ -105,9 +105,9 @@ def do_if_form(expressions, env):
     """
     validate_form(expressions, 2, 3)
     if is_scheme_true(scheme_eval(expressions.first, env)):
-        return scheme_eval(expressions.rest.first, env)
+        return scheme_eval(expressions.rest.first, env, True)
     elif len(expressions) == 3:
-        return scheme_eval(expressions.rest.rest.first, env)
+        return scheme_eval(expressions.rest.rest.first, env, True)
 
 def do_and_form(expressions: Pair | nil, env: Frame):
     """Evaluate a (short-circuited) and form.
@@ -127,10 +127,10 @@ def do_and_form(expressions: Pair | nil, env: Frame):
     if expressions is nil:
         return True
     first, rest = expressions.first, expressions.rest
-    value = scheme_eval(first, env)
     if rest is nil:
-        return value
-    elif is_scheme_false(value):
+        return scheme_eval(first, env, True)
+    value = scheme_eval(first, env)
+    if is_scheme_false(value):
         return False
     return do_and_form(rest, env)
     # END PROBLEM 12
@@ -153,8 +153,10 @@ def do_or_form(expressions: Pair | nil, env: Frame):
     if expressions is nil:
         return False
     first, rest = expressions.first, expressions.rest
+    if rest is nil:
+        return scheme_eval(first, env, True)
     value = scheme_eval(first, env)
-    if rest is nil or is_scheme_true(value):
+    if is_scheme_true(value):
         return value
     return do_or_form(rest, env)
     # END PROBLEM 12
@@ -227,7 +229,7 @@ def do_quasiquote_form(expressions, env):
             if level == 0:
                 expressions = val.rest
                 validate_form(expressions, 1, 1)
-                return scheme_eval(expressions.first, env)
+                return scheme_eval(expressions.first, env, True)
         elif val.first == 'quasiquote':
             level += 1
 

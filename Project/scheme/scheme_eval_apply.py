@@ -94,10 +94,10 @@ def eval_all(expressions: Pair | nil, env: Frame):
     # BEGIN PROBLEM 6
     if expressions is nil:
         return None
-    while isinstance(expressions, Pair):
-        value = scheme_eval(expressions.first, env)
+    while isinstance(expressions.rest, Pair):
+        scheme_eval(expressions.first, env)
         expressions = expressions.rest
-    return value
+    return scheme_eval(expressions.first, env, True)
     # END PROBLEM 6
 
 
@@ -108,12 +108,12 @@ def eval_all(expressions: Pair | nil, env: Frame):
 class Unevaluated:
     """An expression and an environment in which it is to be evaluated."""
 
-    def __init__(self, expr, env):
+    def __init__(self, expr, env: Frame):
         """Expression EXPR to be evaluated in Frame ENV."""
         self.expr = expr
-        self.env = env
+        self.env: Frame = env
 
-def complete_apply(procedure, args, env):
+def complete_apply(procedure, args, env: Frame):
     """Apply procedure to args in env; ensure the result is not an Unevaluated."""
     validate_procedure(procedure)
     val = scheme_apply(procedure, args, env)
@@ -124,7 +124,7 @@ def complete_apply(procedure, args, env):
 
 def optimize_tail_calls(unoptimized_scheme_eval):
     """Return a properly tail recursive version of an eval function."""
-    def optimized_eval(expr, env, tail=False):
+    def optimized_eval(expr, env: Frame, tail: bool=False):
         """Evaluate Scheme expression EXPR in Frame ENV. If TAIL,
         return an Unevaluated containing an expression for further evaluation.
         """
@@ -133,7 +133,9 @@ def optimize_tail_calls(unoptimized_scheme_eval):
 
         result = Unevaluated(expr, env)
         # BEGIN OPTIONAL PROBLEM 1
-        "*** YOUR CODE HERE ***"
+        while isinstance(result, Unevaluated):
+            result = unoptimized_scheme_eval(result.expr, result.env)
+        return result
         # END OPTIONAL PROBLEM 1
     return optimized_eval
 
@@ -154,4 +156,4 @@ def optimize_tail_calls(unoptimized_scheme_eval):
 # Uncomment the following line to apply tail call optimization #
 ################################################################
 
-# scheme_eval = optimize_tail_calls(scheme_eval)
+scheme_eval = optimize_tail_calls(scheme_eval)

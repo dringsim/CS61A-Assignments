@@ -37,7 +37,8 @@ class Frame:
         """Return the value bound to SYMBOL. Errors if SYMBOL is not found."""
         # BEGIN PROBLEM 1
         if symbol in self.bindings:
-            return self.bindings[symbol]
+            value = self.bindings[symbol]
+            return value
         elif self.parent is not None:
             return self.parent.lookup(symbol)
         # END PROBLEM 1
