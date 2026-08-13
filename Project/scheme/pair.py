@@ -13,9 +13,9 @@ class Pair:
     >>> print(s.map(lambda x: x+4))
     (5 6)
     """
-    def __init__(self, first, rest: 'Pair | nil'):
+    def __init__(self, first, rest: 'Pair | nil | Any'):
         self.first = first
-        self.rest: Pair | nil = rest
+        self.rest: Pair | nil | Any = rest
 
     def __repr__(self):
         return 'Pair({0}, {1})'.format(repr(self.first), repr(self.rest))
@@ -38,6 +38,26 @@ class Pair:
         if rest is not nil:
             raise TypeError('length attempted on improper list')
         return n
+
+    def __iter__(self):
+        s = self
+        while isinstance(s, Pair):
+            yield s.first
+            s = s.rest
+        if s is not nil:
+            raise TypeError('iteration reaches a non-pair')
+
+    def __getitem__(self, key):
+        if type(key) != int or key < 0:
+            raise TypeError('index must be an non-negative integer')
+        s = self
+        while key > 0 and isinstance(s.rest, Pair):
+            s, key = s.rest, key - 1
+        if key == 0:
+            return s.first
+        if s.rest is not nil:
+            raise TypeError('index reaches a non-pair')
+        raise IndexError('index out of range')
 
     def __eq__(self, p):
         if not isinstance(p, Pair):
@@ -74,6 +94,14 @@ class nil:
     def __len__(self):
         return 0
 
+    def __iter__(self):
+        return iter([])
+
+    def __getitem__(self, key):
+        if type(key) != int or key < 0:
+            raise TypeError('index must be an non-negative integer')
+        raise IndexError('index out of range')
+
     def map(self, fn):
         return self
 
@@ -93,3 +121,9 @@ def repl_str(val) -> str:
     if isinstance(val, str) and val and val[0] == "\"":
         return "\"" + repr(val[1:-1])[1:-1] + "\""
     return str(val)
+
+def list_to_pair(list):
+    pair = nil
+    for x in reversed(list):
+        pair = Pair(x, pair)
+    return pair

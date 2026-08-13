@@ -123,6 +123,15 @@ def scheme_list(*vals):
         result = Pair(e, result)
     return result
 
+@builtin("list-ref")
+def scheme_list_ref(list, key):
+    validate_type(list, scheme_pairp, 0, 'list-ref')
+    validate_type(key, scheme_numberp, 1, 'list-ref')
+    try:
+        return list[key]
+    except (IndexError, TypeError) as err:
+        raise SchemeError(err)
+
 @builtin("append")
 def scheme_append(*vals):
     if len(vals) == 0:

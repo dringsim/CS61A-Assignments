@@ -271,6 +271,19 @@ def do_quasiquote_form(expressions, env):
         elif val.first == 'quasiquote':
             level += 1
 
+        s = val
+        while isinstance(s, Pair):
+            rest = s.rest
+            if isinstance(rest, Pair) and isinstance(rest.first, Pair) and rest.first.first == 'unquote-splicing':
+                validate_form(rest.first, 2, 2)
+                l = scheme_eval(rest.first.rest.first, env)
+                validate_type(l, scheme_listp, 0, 'unquote-splicing')
+                ins = rest.rest
+                for x in reversed(list(l)):
+                    ins = Pair(x, ins)
+                s.rest = ins
+            s = rest
+
         return val.map(lambda elem: quasiquote_item(elem, env, level))
 
     validate_form(expressions, 1, 1)
@@ -278,6 +291,9 @@ def do_quasiquote_form(expressions, env):
 
 def do_unquote(expressions, env):
     raise SchemeError('unquote outside of quasiquote')
+
+def do_unquote_splicing(expressions, env):
+    raise SchemeError('unquote-splicing outside of quasiquote')
 
 
 #################
@@ -310,5 +326,6 @@ SPECIAL_FORMS = {
     'quote': do_quote_form,
     'quasiquote': do_quasiquote_form,
     'unquote': do_unquote,
+    'unquote-splicing': do_unquote_splicing,
     'mu': do_mu_form,
 }
