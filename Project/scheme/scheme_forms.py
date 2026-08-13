@@ -214,6 +214,44 @@ def make_let_frame(bindings: Pair | nil, env: Frame):
     # END PROBLEM 14
     return env.make_child_frame(names, vals)
 
+def do_letsec_form(expressions, env):
+    """Evaluate a let* form."""
+    validate_form(expressions, 2)
+    let_env = make_letsec_frame(expressions.first, env)
+    return eval_all(expressions.rest, let_env)
+
+def make_letsec_frame(bindings: Pair | nil, env: Frame):
+    if not scheme_listp(bindings):
+        raise SchemeError('bad bindings list in let* form')
+    frame = env.make_child_frame(nil, nil)
+    while bindings is not nil:
+        binding = bindings.first
+        validate_form(binding, 2, 2)
+        frame.define(binding.first, scheme_eval(binding.rest.first, frame))
+        bindings = bindings.rest
+    return frame
+
+def do_letrec_form(expressions, env):
+    """Evaluate a let* form."""
+    validate_form(expressions, 2)
+    let_env = make_letrec_frame(expressions.first, env)
+    return eval_all(expressions.rest, let_env)
+
+def make_letrec_frame(bindings: Pair | nil, env: Frame):
+    if not scheme_listp(bindings):
+        raise SchemeError('bad bindings list in letrec form')
+    names = pairs = unds = nil
+    while bindings is not nil:
+        binding = bindings.first
+        validate_form(binding, 2, 2)
+        names = Pair(binding.first, names)
+        pairs = Pair(binding, pairs)
+        unds = Pair(None, unds)
+        bindings = bindings.rest
+    validate_formals(names)
+    frame = env.make_child_frame(names, unds)
+    pairs.map(lambda x: frame.define(x.first, scheme_eval(x.rest.first, frame)))
+    return frame
 
 
 def do_quasiquote_form(expressions, env):
@@ -229,7 +267,7 @@ def do_quasiquote_form(expressions, env):
             if level == 0:
                 expressions = val.rest
                 validate_form(expressions, 1, 1)
-                return scheme_eval(expressions.first, env, True)
+                return scheme_eval(expressions.first, env)
         elif val.first == 'quasiquote':
             level += 1
 
@@ -266,6 +304,8 @@ SPECIAL_FORMS = {
     'if': do_if_form,
     'lambda': do_lambda_form,
     'let': do_let_form,
+    'let*': do_letsec_form,
+    'letrec': do_letrec_form,
     'or': do_or_form,
     'quote': do_quote_form,
     'quasiquote': do_quasiquote_form,
