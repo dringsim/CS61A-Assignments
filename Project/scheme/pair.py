@@ -105,8 +105,8 @@ class nil:
         return iter([])
 
     def __getitem__(self, key):
-        if type(key) != int or key < 0:
-            raise TypeError('index must be an non-negative integer')
+        if type(key) != int:
+            raise TypeError('index must be an integer')
         raise IndexError('index out of range')
 
     def map(self, fn):
