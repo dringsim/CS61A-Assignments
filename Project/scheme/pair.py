@@ -122,8 +122,8 @@ def repl_str(val) -> str:
         return "\"" + repr(val[1:-1])[1:-1] + "\""
     return str(val)
 
-def list_to_pair(list):
-    pair = nil
+def list_to_pair(list, rest=nil):
+    pair = rest
     for x in reversed(list):
         pair = Pair(x, pair)
     return pair

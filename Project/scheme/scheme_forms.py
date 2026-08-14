@@ -278,11 +278,9 @@ def do_quasiquote_form(expressions, env):
                 validate_form(rest.first, 2, 2)
                 l = scheme_eval(rest.first.rest.first, env)
                 validate_type(l, scheme_listp, 0, 'unquote-splicing')
-                ins = rest.rest
-                for x in reversed(list(l)):
-                    ins = Pair(x, ins)
+                ins = list_to_pair(list(l), rest.rest)
                 s.rest = ins
-            s = rest
+            s = s.rest
 
         return val.map(lambda elem: quasiquote_item(elem, env, level))
 
