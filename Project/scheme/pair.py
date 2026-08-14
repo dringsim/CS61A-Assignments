@@ -48,8 +48,15 @@ class Pair:
             raise TypeError('iteration reaches a non-pair')
 
     def __getitem__(self, key):
-        if type(key) != int or key < 0:
-            raise TypeError('index must be an non-negative integer')
+        if type(key) != int:
+            raise TypeError('index must be an integer')
+        if key < 0:
+            try:
+                key = len(self) + key
+            except TypeError:
+                raise TypeError('index reaches a non-pair')
+            if key < 0:
+                raise IndexError('index out of range')
         s = self
         while key > 0 and isinstance(s.rest, Pair):
             s, key = s.rest, key - 1
