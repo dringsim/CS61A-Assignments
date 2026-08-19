@@ -87,7 +87,7 @@ class BuiltinProcedure(Procedure):
 class LambdaProcedure(Procedure):
     """A procedure defined by a lambda expression or a define form."""
 
-    def __init__(self, formals, body, env):
+    def __init__(self, formals, body, env, memorized=False):
         """A procedure with formal parameter list FORMALS (a Scheme list),
         whose body is the Scheme list BODY, and whose parent environment
         starts with Frame ENV."""
@@ -99,6 +99,7 @@ class LambdaProcedure(Procedure):
         self.formals: Pair | nil = formals
         self.body: Pair | nil = body
         self.env: Frame = env
+        self.cache: dict[Any, Any] | None = {} if memorized else None
 
     def __str__(self):
         return str(Pair('lambda', Pair(self.formals, self.body)))

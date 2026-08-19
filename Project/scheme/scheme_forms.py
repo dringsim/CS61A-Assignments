@@ -55,6 +55,22 @@ def do_define_form(expressions: Pair, env: Frame):
         bad_signature = signature.first if isinstance(signature, Pair) else signature
         raise SchemeError('non-symbol: {0}'.format(bad_signature))
 
+def do_define_memo_form(expressions:Pair, env: Frame):
+    validate_form(expressions, 2)
+    signature = expressions.first
+    validate_form(signature, 2)
+    if scheme_symbolp(signature.first):
+        name = signature.first
+        formals = signature.rest
+        validate_formals(formals)
+        body  = expressions.rest
+        procedure = LambdaProcedure(formals, body, env, True)
+        env.define(name, procedure)
+        return name
+    else:
+        bad_signature = signature.first if isinstance(signature, Pair) else signature
+        raise SchemeError('non-symbol: {0}'.format(bad_signature))
+
 def do_quote_form(expressions: Pair, env: Frame):
     """Evaluate a quote form.
 
@@ -316,6 +332,7 @@ SPECIAL_FORMS = {
     'begin': do_begin_form,
     'cond': do_cond_form,
     'define': do_define_form,
+    'define-memo': do_define_memo_form,
     'if': do_if_form,
     'lambda': do_lambda_form,
     'let': do_let_form,

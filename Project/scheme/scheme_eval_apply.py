@@ -64,6 +64,18 @@ def scheme_apply(procedure, args: Pair | nil, env):
         except TypeError as err:
             raise SchemeError(f'incorrect number of arguments: {procedure}')
     elif isinstance(procedure, LambdaProcedure):
+        if procedure.cache is not None:
+            try:
+                args_key = pair_to_tuple_nested(args)
+                if args_key not in procedure.cache:
+                    child_env = procedure.env.make_child_frame(procedure.formals, args)
+                    val = eval_all(procedure.body, child_env)
+                    if isinstance(val, Unevaluated):
+                        val = scheme_eval(val.expr, val.env)
+                    procedure.cache[args_key] = val
+                return procedure.cache[args_key]
+            except TypeError:
+                pass
         # BEGIN PROBLEM 9
         child_env = procedure.env.make_child_frame(procedure.formals, args)
         return eval_all(procedure.body, child_env)
@@ -156,4 +168,5 @@ def optimize_tail_calls(unoptimized_scheme_eval):
 # Uncomment the following line to apply tail call optimization #
 ################################################################
 
+unoptimized_scheme_eval = scheme_eval
 scheme_eval = optimize_tail_calls(scheme_eval)

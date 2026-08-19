@@ -134,3 +134,17 @@ def list_to_pair(list, rest=nil):
     for x in reversed(list):
         pair = Pair(x, pair)
     return pair
+
+def pair_to_list_nested(pair: Pair | nil):
+    lst = list(pair)
+    for i, x in enumerate(lst):
+        if isinstance(x, Pair):
+            lst[i] = pair_to_list_nested(x)
+    return lst
+
+def pair_to_tuple_nested(pair: Pair | nil):
+    lst = list(pair)
+    for i, x in enumerate(lst):
+        if isinstance(x, Pair):
+            lst[i] = pair_to_tuple_nested(x)
+    return tuple(lst)
